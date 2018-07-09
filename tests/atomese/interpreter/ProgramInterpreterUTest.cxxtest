@@ -1,0 +1,96 @@
+/** combo_atomeseUTest.cxxtest ---
+ *
+ * Copyright (C) 2018 OpenCog Foundation
+ *
+ * Author: Kasim Ebrahim
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License v3 as
+ * published by the Free Software Foundation and including the exceptions
+ * at http://opencog.org/wiki/Licenses
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, write to:
+ * Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+
+#include <opencog/atoms/base/Handle.h>
+#include <opencog/atoms/base/Link.h>
+#include <opencog/atoms/base/Node.h>
+#include <moses/atomese/interpreter/ProgramInterpreter.h>
+
+
+using namespace std;
+using namespace opencog;
+
+
+class ProgramInterpreterUTest : public CxxTest::TestSuite{
+private:
+	Handle _input_table;
+	Handle expected_h;
+public:
+	void setUp()
+	{
+		// create the schema containing the problem data
+		// another way to represent this problem data might be
+		// to store valuations using ProtoAtom for each features(i1, i2)
+		HandleSeq headseq = {createNode(SCHEMA_NODE, "o"),
+		                     createNode(SCHEMA_NODE, "i1"),
+		                     createNode(SCHEMA_NODE, "i2")};
+		Handle headList = createLink(headseq, LIST_LINK);
+
+		HandleSeq r1lst = {createNode(NODE, "r1"),
+		                   createNode(NUMBER_NODE, "1"),
+		                   createNode(NUMBER_NODE, "0"),
+		                   createNode(NUMBER_NODE, "1")};
+
+		HandleSeq r2lst = {createNode(NODE, "r2"),
+		                   createNode(NUMBER_NODE, "1"),
+		                   createNode(NUMBER_NODE, "1"),
+		                   createNode(NUMBER_NODE, "0")};
+
+		HandleSeq r3lst = {createNode(NODE, "r3"),
+		                   createNode(NUMBER_NODE, "0"),
+		                   createNode(NUMBER_NODE, "0"),
+		                   createNode(NUMBER_NODE, "0")};
+
+		HandleSeq rows_seq = {createLink(r1lst, LIST_LINK),
+		                      createLink(r2lst, LIST_LINK),
+		                      createLink(r3lst, LIST_LINK)};
+		Handle rows = createLink(rows_seq, SET_LINK);
+
+		HandleSeq i_seq = {headList, rows};
+		_input_table = createLink(i_seq, SIMILARITY_LINK);
+
+		// expects the results of the program to be a Handle with ProtoAtoms
+		// containing values of program executions on problem data
+		expected_h = createNode(SCHEMA_NODE, "out");
+		Handle key = createNode(NODE, "*-AS-MOSES:ProgramResultKey-*");
+
+		std::vector<double> _value = {1.0,0.0,1.0};
+		ProtoAtomPtr expected_value_ptr(new FloatValue(_value));
+
+		expected_h->setValue(key, expected_value_ptr);
+	}
+
+	void test_interpret(void)
+	{
+
+		atomese::ProgramInterpreter interpreter(&_input_table);
+
+		HandleSeq f_seq = {createNode(SCHEMA_NODE, "i1"),
+		                   createNode(SCHEMA_NODE, "i2")};
+		Handle program = createLink(f_seq, PLUS_LINK);
+
+		Handle result = interpreter.interpret(program);
+
+		TS_ASSERT(content_eq(result, expected_h));
+	}
+};
