@@ -33,7 +33,7 @@ namespace opencog { namespace combo {
 using namespace std;
 using namespace boost;
 
-Handle atomese_argument(const argument &a,
+Handle argument2atomese(const argument &a,
                       const id::procedure_type &parent_procedure_type)
 {
 	Handle h;
@@ -69,7 +69,7 @@ Handle atomese_argument(const argument &a,
 	return h;
 }
 
-Type atomese_builtin(const builtin &b, id::procedure_type &procedure_type)
+Type builtin2atomese(const builtin &b, id::procedure_type &procedure_type)
 {
 	switch (b) {
 		case id::logical_and:
@@ -90,25 +90,25 @@ Type atomese_builtin(const builtin &b, id::procedure_type &procedure_type)
 	}
 }
 
-std::pair<Type, Handle> atomese_vertex(const vertex &v,
+std::pair<Type, Handle> vertex2atomese(const vertex &v,
                     id::procedure_type &parent_procedure_type)
 {
 	Handle handle;
 	Type type = -1;
 	if (const argument *a = get<argument>(&v)) {
-		handle = atomese_argument(*a, parent_procedure_type);
+		handle = argument2atomese(*a, parent_procedure_type);
 	} else if (const builtin *b = get<builtin>(&v)) {
-		type = atomese_builtin(*b, parent_procedure_type);
+		type = builtin2atomese(*b, parent_procedure_type);
 	}
 	return std::make_pair(type, handle);
 }
 
-Handle atomese_combo(const combo_tree &ct)
+Handle combo2atomese(const combo_tree &ct)
 {
 	Handle handle;
 	combo_tree::iterator it = ct.begin();
 	id::procedure_type ptype = id::procedure_type::unknown;
-	handle = atomese_combo_it(it, ptype);
+	handle = combo_it2atomese(it, ptype);
 	return handle;
 }
 

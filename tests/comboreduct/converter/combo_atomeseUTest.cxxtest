@@ -24,7 +24,6 @@
 #include <moses/comboreduct/converter/combo_atomese.h>
 #include <moses/comboreduct/combo/combo.h>
 #include <opencog/atoms/base/Handle.h>
-#include <opencog/atoms/base/atom_types.h>
 #include <opencog/atoms/base/Link.h>
 #include <opencog/atoms/base/Node.h>
 
@@ -36,10 +35,10 @@ using namespace opencog;
 class combo_atomeseUTest : public CxxTest::TestSuite{
 
 public:
-    void test_atomese_combo_predicate(void){
+    void test_combo2atomese_predicate(void){
         combo::combo_tree tr = combo::str2combo_tree("and(or($1 $2) not($3))", {});
 
-        Handle h = combo::atomese_combo(tr);
+        Handle h = combo::combo2atomese(tr);
 
         HandleSeq list_or = {createNode(PREDICATE_NODE, "1"), createNode(PREDICATE_NODE, "2")};
         Handle or_link = createLink(list_or, OR_LINK);
@@ -54,10 +53,10 @@ public:
 
     }
 
-    void test_atomese_combo_schema(void){
+    void test_combo2atomese_schema(void){
         combo::combo_tree tr = combo::str2combo_tree("+($1 $2)", {});
 
-        Handle h = combo::atomese_combo(tr);
+        Handle h = combo::combo2atomese(tr);
 
         HandleSeq list_plus = {createNode(SCHEMA_NODE, "1"), createNode(SCHEMA_NODE, "2")};
         Handle plus_link = createLink(list_plus, PLUS_LINK);
