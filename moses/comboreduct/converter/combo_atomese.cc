@@ -25,6 +25,7 @@
 #include <opencog/atoms/base/Node.h>
 #include <opencog/atoms/base/Link.h>
 #include <moses/comboreduct/combo/vertex.h>
+#include <moses/comboreduct/combo/combo.h>
 #include "combo_atomese.h"
 
 
@@ -110,6 +111,76 @@ Handle combo2atomese(const combo_tree &ct)
 	id::procedure_type ptype = id::procedure_type::unknown;
 	handle = combo_it2atomese(it, ptype);
 	return handle;
+}
+
+combo_tree atomese2combo(const Handle &h)
+{
+	combo_tree tr;
+	stringstream ss;
+	vector<string> labels = {};
+	atomese2stream(h, ss, labels);
+	tr = str2combo_tree(ss.str(), labels);
+	return tr;
+}
+
+void atomese2stream(const Handle &h, std::stringstream &ss, std::vector<string> &labels)
+{
+	if(h->is_link()){
+		link2stream(h, ss);
+		for(auto child_it = h->getOutgoingSet().begin();
+		    child_it != h->getOutgoingSet().end();
+		    ++child_it){
+			atomese2stream(*child_it, ss, labels);
+
+			if((child_it + 1) != h->getOutgoingSet().end()){
+				ss<<" ";
+			}
+		}
+		ss<<")";
+	}
+	else{
+		node2stream(h, ss, labels);
+	}
+}
+
+void node2stream(const Handle &h, stringstream& ss, std::vector<string> &labels)
+{
+	Type t = h->get_type();
+	if(PREDICATE_NODE == t || SCHEMA_NODE ==t || VARIABLE_NODE){
+		ss<<"$"<<h->get_name();
+		labels.push_back(h->get_name());
+		return;
+	}
+	if(nameserver().isA(t, NODE)){
+		ss<<h->get_name();
+	}
+	else{
+		OC_ASSERT(false, "unsupported type");
+	}
+}
+
+void link2stream(const Handle &h, std::stringstream &ss)
+{
+	Type t = h->get_type();
+	if(PLUS_LINK == t){
+		ss<<"+(";
+		return;
+	}
+	if(NOT_LINK == t){
+		ss<<"not(";
+		return;
+	}
+	if(AND_LINK == t){
+		ss<<"and(";
+		return;
+	}
+	if(OR_LINK == t){
+		ss<<"or(";
+		return;
+	}
+	else{
+		OC_ASSERT(false, "unsupported type");
+	}
 }
 
 }}  // ~namespaces combo opencog

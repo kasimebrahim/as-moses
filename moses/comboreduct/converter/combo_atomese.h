@@ -50,6 +50,14 @@ enum __attribute__((packed)) procedure_type{
 Handle combo2atomese(const combo_tree &tr);
 
 /**
+ * Convert a atomese to combo_tree program.
+ *
+ * @param Handle   the Handle containing the atomese program
+ * @return                 the combo_tree containing the combo program
+ */
+combo_tree atomese2combo(const Handle &h);
+
+/**
  * Convert a combo_tree::vertex to atomese program.
  *
  * @param Handle&       handle ref, if the vertex is converted to node it
@@ -112,6 +120,12 @@ Handle argument2atomese(const argument &, const id::procedure_type &);
  * @return                 return Link type to be created
  */
 Type builtin2atomese(const builtin &, id::procedure_type &);
+
+void atomese2stream(const Handle &h, std::stringstream &, std::vector<std::string> &);
+
+void node2stream(const Handle &h, std::stringstream &, std::vector<std::string> &);
+
+void link2stream(const Handle &h, std::stringstream &);
 
 }}  // ~namespaces combo opencog
 

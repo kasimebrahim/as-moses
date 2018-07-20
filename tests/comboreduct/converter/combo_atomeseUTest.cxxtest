@@ -64,4 +64,35 @@ public:
         TS_ASSERT(content_eq(h, plus_link));
 
     }
+
+	void test_node2stream(void){
+		Handle h = createNode(VARIABLE_NODE, "1");
+		stringstream ss;
+		std::vector<std::string> labels = {};
+		combo::node2stream(h, ss, labels);
+		string str = ss.str();
+		TS_ASSERT(str == "$1");
+	}
+
+	void test_atomese2stream(void){
+		HandleSeq seq1 = {createNode(SCHEMA_NODE, "v1"),
+		                 createNode(SCHEMA_NODE, "v2")};
+		Handle prg1 = createLink(seq1, PLUS_LINK);
+
+		HandleSeq seq2 = {createNode(VARIABLE_NODE, "v2"),
+		                 createNode(VARIABLE_NODE, "v3")};
+
+		Handle prg2 = createLink(seq2, AND_LINK);
+
+		HandleSeq seq = {prg1, prg2};
+		Handle prg = createLink(seq, OR_LINK);
+
+		stringstream ss;
+		std::vector<std::string> labels = {};
+		combo::atomese2stream(prg, ss, labels);
+
+		string str = ss.str();
+		TS_ASSERT(str == "or(+($v1 $v2) and($v2 $v3))");
+	}
+
 };
