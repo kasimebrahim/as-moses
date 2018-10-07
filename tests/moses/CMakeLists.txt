@@ -2,6 +2,12 @@
 # Tests are listed and run in more-or-less dependency order:
 # Later tests assume earlier tests pass.
 #
+ADD_CXXTEST(Atomese_based_scorerUTest)
+TARGET_LINK_LIBRARIES(Atomese_based_scorerUTest
+		moses
+		comboreduct
+		${COGUTIL_LIBRARY})
+
 ADD_CXXTEST(iostream_scored_combo_treeUTest)
 TARGET_LINK_LIBRARIES(iostream_scored_combo_treeUTest
 	moses

@@ -1,0 +1,42 @@
+#include "moses/moses/representation/instance_scorer.h"
+#include "moses/moses/scoring/behave_cscore.h"
+#include "moses/moses/moses/types.h"
+#include <cxxtest/TestSuite.h>
+#include "moses/comboreduct/reduct/reduct.h"
+using namespace opencog;
+using namespace std;
+using namespace combo;
+using namespace moses;
+using namespace reduct;
+
+class Atomese_based_scorer: public CxxTest::TestSuite {
+public:
+    behave_cscore &cs;
+    combo_tree totree(string str) {
+        stringstream ss(str);
+        combo_tree tr;
+        ss >> tr;
+        return tr;
+    }
+
+    int reduct_effort=2;
+    void test_atomese_score()
+    {
+    string str="(and(or($1 $2) $3))";
+    combo_tree tr = totree(str);
+    type_tree tt = infer_type_tree(tr);
+    vertex_set ignore_ops{id::div, id::exp, id::log, id::sin};
+    representation rep(contin_reduction(reduct_effort, ignore_ops),
+                   contin_reduction(reduct_effort, ignore_ops),
+                   tr, tt, ignore_ops,
+                   NULL, NULL, false);
+
+    field_set fs(field_set::contin_spec(0.0,0.5,0.5,4), 1);
+    instance inst(fs.packed_width());
+    atomese_based_scorer atomese_scorer(cs, rep, false);
+    composite_score cp_score = atomese_scorer(inst);
+    composite_score expected_score = composite_score(-0.0,3.0,0.0,0.0);
+    //TODO assert if two scores are equal
+    TS_ASSERT_EQUALS(-3,-3);
+    }
+};

@@ -63,6 +63,7 @@ ADD_LIBRARY (moses SHARED
 	representation/knob_mapper
 	representation/knobs
 	representation/representation
+	representation/instance_scorer
 
 	scoring/behave_cscore
 	scoring/bscores
